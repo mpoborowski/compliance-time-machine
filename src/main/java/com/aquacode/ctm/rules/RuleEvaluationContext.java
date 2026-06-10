@@ -5,6 +5,6 @@ import java.math.BigDecimal;
 public record RuleEvaluationContext(
     String country,
     BigDecimal amount,
-    boolean pep
+    boolean politicallyExposedPerson
 ) {
 }

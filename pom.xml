@@ -15,7 +15,7 @@
     <description>compliance-time-machine</description>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>24</java.version>
         <spring-modulith.version>2.0.6</spring-modulith.version>
     </properties>
 
@@ -110,6 +110,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
+                </configuration>
                 <executions>
                     <execution>
                         <id>default-compile</id>
@@ -142,6 +147,13 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>--enable-preview</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>
