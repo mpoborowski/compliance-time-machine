@@ -8,12 +8,9 @@ import com.aquacode.ctm.evaluation.infrastructure.dto.TriggeredRuleResponse;
 import com.aquacode.ctm.rules.RuleResult;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface EvaluationMapper {
-
-    EvaluationMapper INSTANCE = Mappers.getMapper(EvaluationMapper.class);
 
     Transaction fromEvaluationRequest(EvaluateTransactionRequest request);
 

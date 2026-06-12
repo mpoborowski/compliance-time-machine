@@ -10,6 +10,7 @@ import com.aquacode.ctm.rules.RuleMetadata;
 import com.aquacode.ctm.rules.RuleOutcome;
 import com.aquacode.ctm.rules.RuleResult;
 import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -19,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class EvaluationMapperTest {
 
-    private final EvaluationMapper mapper = EvaluationMapper.INSTANCE;
+    private final EvaluationMapper mapper = Mappers.getMapper(EvaluationMapper.class);
 
     @Test
     void fromEvaluationRequest_shouldMapEvaluateTransactionRequestToTransaction() {

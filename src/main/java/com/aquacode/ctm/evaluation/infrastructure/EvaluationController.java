@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/evaluations")
 @RequiredArgsConstructor
-class EvaluationController {
+public class EvaluationController {
 
     private final EvaluationService evaluationService;
-    private final EvaluationMapper mapper = EvaluationMapper.INSTANCE;
+    private final EvaluationMapper mapper;
 
     @PostMapping
     EvaluateTransactionResponse evaluate(@Valid @RequestBody EvaluateTransactionRequest request) {

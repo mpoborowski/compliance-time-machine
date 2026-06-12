@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class EngineConfiguration {
 
     @Bean
-    @ConditionalOnProperty(name = "ruleEngine.type", havingValue = "default")
+    @ConditionalOnProperty(name = "ruleEngine.type", havingValue = "default", matchIfMissing = true)
     public DefaultRuleEngine defaultRuleEngine() {
         return new DefaultRuleEngine();
     }
