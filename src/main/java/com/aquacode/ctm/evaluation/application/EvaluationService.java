@@ -20,6 +20,4 @@ public class EvaluationService {
 
         return ComplianceDecisionFactory.create(results, ruleSet.version());
     }
-
-
 }
