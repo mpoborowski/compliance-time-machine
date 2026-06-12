@@ -1,5 +1,11 @@
-package com.aquacode.ctm.rules;
+package com.aquacode.ctm.rules.application;
 
+import com.aquacode.ctm.rules.Rule;
+import com.aquacode.ctm.rules.RuleEngine;
+import com.aquacode.ctm.rules.RuleEvaluationContext;
+import com.aquacode.ctm.rules.RuleMetadata;
+import com.aquacode.ctm.rules.RuleResult;
+import com.aquacode.ctm.rules.RuleSet;
 import lombok.SneakyThrows;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
@@ -58,7 +64,7 @@ class ConcurrentRuleEngineTest extends RuleEngineContractTest {
             }
         };
 
-        var ruleSet = new RuleSet("v1", java.time.Instant.now(), List.of(slowRule, slowRule2));
+        var ruleSet = new RuleSet("v1", Instant.now(), List.of(slowRule, slowRule2));
         long start = System.currentTimeMillis();
 
         List<RuleResult> results = engine.evaluate(ruleSet, context(BigDecimal.ONE, "PL", false));
@@ -94,7 +100,7 @@ class ConcurrentRuleEngineTest extends RuleEngineContractTest {
         Rule badRule = new Rule() {
             @Override
             public RuleResult evaluate(RuleEvaluationContext context) {
-                throw new RuntimeException("boom");
+                throw new RuntimeException("rule failure");
             }
 
             @Override
@@ -103,14 +109,14 @@ class ConcurrentRuleEngineTest extends RuleEngineContractTest {
             }
         };
 
-        var ruleSet = new RuleSet("v1", java.time.Instant.now(), List.of(badRule));
+        var ruleSet = new RuleSet("v1", Instant.now(), List.of(badRule));
 
         assertThatThrownBy(() -> engine.evaluate(ruleSet, context(BigDecimal.ONE, "PL", false)))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("Failed to process rules");
     }
 
-    private Rule ruleWithDelay(String id, List<String> executed, long ms) {
+    private static Rule ruleWithDelay(String id, List<String> executed, long ms) {
         return new Rule() {
             @SneakyThrows
             @Override

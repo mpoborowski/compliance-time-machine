@@ -1,4 +1,6 @@
-package com.aquacode.ctm.rules;
+package com.aquacode.ctm.rules.application;
+
+import com.aquacode.ctm.rules.RuleEngine;
 
 class DefaultRuleEngineTest extends RuleEngineContractTest {
 

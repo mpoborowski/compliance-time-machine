@@ -1,10 +1,12 @@
-package com.aquacode.ctm.rules;
+package com.aquacode.ctm.rules.application;
 
-import org.springframework.stereotype.Component;
+import com.aquacode.ctm.rules.RuleEngine;
+import com.aquacode.ctm.rules.RuleEvaluationContext;
+import com.aquacode.ctm.rules.RuleResult;
+import com.aquacode.ctm.rules.RuleSet;
 
 import java.util.List;
 
-@Component
 public class DefaultRuleEngine implements RuleEngine {
     @Override
     public List<RuleResult> evaluate(RuleSet ruleSet, RuleEvaluationContext context) {

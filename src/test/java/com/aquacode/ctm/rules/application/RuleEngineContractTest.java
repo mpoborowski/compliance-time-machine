@@ -1,5 +1,9 @@
-package com.aquacode.ctm.rules;
+package com.aquacode.ctm.rules.application;
 
+import com.aquacode.ctm.rules.RuleEngine;
+import com.aquacode.ctm.rules.RuleOutcome;
+import com.aquacode.ctm.rules.RuleResult;
+import com.aquacode.ctm.rules.RuleSet;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

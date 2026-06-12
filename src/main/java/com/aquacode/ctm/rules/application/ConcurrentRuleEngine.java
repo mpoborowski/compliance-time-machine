@@ -1,18 +1,20 @@
-package com.aquacode.ctm.rules;
+package com.aquacode.ctm.rules.application;
 
-import org.springframework.stereotype.Component;
+import com.aquacode.ctm.rules.RuleEngine;
+import com.aquacode.ctm.rules.RuleEvaluationContext;
+import com.aquacode.ctm.rules.RuleResult;
+import com.aquacode.ctm.rules.RuleSet;
 
 import java.util.List;
 import java.util.concurrent.StructuredTaskScope;
 
-@Component
 public class ConcurrentRuleEngine implements RuleEngine {
     @Override
     public List<RuleResult> evaluate(RuleSet ruleSet, RuleEvaluationContext context) {
         try (var scope = new StructuredTaskScope.ShutdownOnFailure()) {
             var futures = ruleSet.rules()
                 .stream()
-                .map(rule -> scope.fork( () -> rule.evaluate(context)))
+                .map(rule -> scope.fork(() -> rule.evaluate(context)))
                 .toList();
 
             scope.join();
