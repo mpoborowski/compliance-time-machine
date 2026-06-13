@@ -1,12 +1,13 @@
-package com.aquacode.ctm.shared;
+package com.aquacode.ctm.audit;
 
+import com.aquacode.ctm.evaluation.Decision;
 import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
 @Builder
-public record DecisionMadeEvent(
+public record HistoricalTransactionAuditRecord(
     String transactionId,
     String customerId,
     String country,
@@ -14,8 +15,8 @@ public record DecisionMadeEvent(
     boolean politicallyExposedPerson,
     Instant transactionTimestamp,
     String decisionId,
-    String decision,
     String ruleSetVersion,
+    Decision decision,
     Instant evaluatedAt
 ) {
 }

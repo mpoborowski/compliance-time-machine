@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -43,23 +44,31 @@ class AuditEventListenerTest {
     }
 
     private static DecisionMadeEvent givenDecisionMadeEvent() {
-        return new DecisionMadeEvent(
-            "tx-1",
-            "dec_1",
-            Decision.APPROVED.name(),
-            "v1",
-            Instant.parse("2025-01-01T12:00:00Z")
-        );
+        return DecisionMadeEvent.builder()
+            .transactionId("tx-1")
+            .customerId("customer-1")
+            .politicallyExposedPerson(false)
+            .amount(BigDecimal.TEN)
+            .country("PL")
+            .ruleSetVersion("v1")
+            .decisionId("dec_1")
+            .decision(Decision.APPROVED.name())
+            .evaluatedAt(Instant.parse("2025-01-01T12:00:00Z"))
+            .build();
     }
 
     private static AuditRecordEntity givenAuditRecord() {
-        return new AuditRecordEntity(
-            UUID.fromString("00000000-0000-0000-0000-000000000001"),
-            "tx-1",
-            "dec_1",
-            "v1",
-            Decision.APPROVED.name(),
-            Instant.parse("2025-01-01T12:00:00Z")
-        );
+        return AuditRecordEntity.builder()
+            .id(UUID.fromString("00000000-0000-0000-0000-000000000001"))
+            .amount(BigDecimal.TEN)
+            .customerId("customer_1")
+            .timestamp(Instant.parse("2025-01-01T12:00:00Z"))
+            .country("PL")
+            .transactionTimestamp(Instant.parse("2025-01-01T12:00:00Z"))
+            .politicallyExposedPerson(false)
+            .decisionId("dec_1")
+            .ruleSetVersion("v1")
+            .decision("APPROVED")
+            .build();
     }
 }

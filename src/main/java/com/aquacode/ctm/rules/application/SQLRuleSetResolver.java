@@ -3,6 +3,7 @@ package com.aquacode.ctm.rules.application;
 import com.aquacode.ctm.rules.Rule;
 import com.aquacode.ctm.rules.RuleMetadata;
 import com.aquacode.ctm.rules.RuleSet;
+import com.aquacode.ctm.rules.RuleSetNotFoundException;
 import com.aquacode.ctm.rules.RuleSetResolver;
 import com.aquacode.ctm.rules.infrastructure.persistence.RuleDefinitionEntity;
 import com.aquacode.ctm.rules.infrastructure.persistence.RuleSetEntity;

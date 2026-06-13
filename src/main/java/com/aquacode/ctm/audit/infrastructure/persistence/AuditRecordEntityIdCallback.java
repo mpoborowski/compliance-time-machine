@@ -14,13 +14,18 @@ class AuditRecordEntityIdCallback implements BeforeConvertCallback<AuditRecordEn
             return entity;
         }
 
-        return new AuditRecordEntity(
-            UUID.randomUUID(),
-            entity.transactionId(),
-            entity.decisionId(),
-            entity.ruleSetVersion(),
-            entity.decision(),
-            entity.timestamp()
-        );
+        return AuditRecordEntity.builder()
+            .id(UUID.randomUUID())
+            .transactionId(entity.transactionId())
+            .amount(entity.amount())
+            .customerId(entity.customerId())
+            .timestamp(entity.timestamp())
+            .country(entity.country())
+            .transactionTimestamp(entity.transactionTimestamp())
+            .politicallyExposedPerson(entity.politicallyExposedPerson())
+            .decisionId(entity.decisionId())
+            .decision(entity.decision())
+            .ruleSetVersion(entity.ruleSetVersion())
+            .build();
     }
 }

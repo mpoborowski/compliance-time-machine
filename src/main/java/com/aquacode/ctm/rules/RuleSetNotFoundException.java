@@ -1,4 +1,4 @@
-package com.aquacode.ctm.rules.application;
+package com.aquacode.ctm.rules;
 
 import java.time.Instant;
 

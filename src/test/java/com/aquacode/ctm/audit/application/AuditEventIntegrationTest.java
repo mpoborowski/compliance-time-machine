@@ -14,6 +14,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
@@ -43,13 +44,18 @@ class AuditEventIntegrationTest {
     @Test
     void shouldPersistAuditRecordWhenDecisionMadeEventIsPublishedAfterTransactionCommit() {
         var evaluatedAt = Instant.parse("2025-01-01T12:00:00Z");
-        var event = new DecisionMadeEvent(
-            "tx-1",
-            "dec_1",
-            Decision.APPROVED.name(),
-            "v1",
-            evaluatedAt
-        );
+        var event = DecisionMadeEvent.builder()
+            .transactionId("tx-1")
+            .customerId("customer-1")
+            .politicallyExposedPerson(false)
+            .amount(BigDecimal.TEN)
+            .country("PL")
+            .ruleSetVersion("v1")
+            .decisionId("dec_1")
+            .decision(Decision.APPROVED.name())
+            .evaluatedAt(evaluatedAt)
+            .transactionTimestamp(evaluatedAt)
+            .build();
 
         transactionTemplate.executeWithoutResult(_ -> eventPublisher.publishEvent(event));
 
@@ -57,6 +63,11 @@ class AuditEventIntegrationTest {
             .orElseThrow(() -> new AssertionError("Audit record was not persisted within timeout"));
 
         assertThat(auditRecord.id()).isNotNull();
+        assertThat(auditRecord.transactionId()).isEqualTo("tx-1");
+        assertThat(auditRecord.customerId()).isEqualTo("customer-1");
+        assertThat(auditRecord.country()).isEqualTo("PL");
+        assertThat(auditRecord.politicallyExposedPerson()).isFalse();
+        assertThat(auditRecord.amount()).isEqualByComparingTo(BigDecimal.TEN);
         assertThat(auditRecord.transactionId()).isEqualTo("tx-1");
         assertThat(auditRecord.decisionId()).isEqualTo("dec_1");
         assertThat(auditRecord.ruleSetVersion()).isEqualTo("v1");

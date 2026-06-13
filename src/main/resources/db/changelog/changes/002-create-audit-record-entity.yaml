@@ -18,6 +18,31 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: customer_id
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: country
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: decimal(19, 4)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: politically_exposed_person
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: transaction_timestamp
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
                   name: decision_id
                   type: varchar(100)
                   constraints:

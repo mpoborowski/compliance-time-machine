@@ -28,6 +28,11 @@ public class EvaluationService {
 
         eventPublisher.publishEvent(new DecisionMadeEvent(
             transaction.transactionId(),
+            transaction.customerId(),
+            transaction.country(),
+            transaction.amount(),
+            transaction.politicallyExposedPerson(),
+            transaction.transactionTimestamp(),
             decision.decisionId(),
             decision.decision().name(),
             decision.ruleSetVersion(),

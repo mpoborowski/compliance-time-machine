@@ -1,5 +1,6 @@
 package com.aquacode.ctm.audit.application;
 
+import com.aquacode.ctm.audit.HistoricalTransactionAuditRecord;
 import com.aquacode.ctm.audit.infrastructure.persistence.AuditRecordEntity;
 import com.aquacode.ctm.shared.DecisionMadeEvent;
 import org.mapstruct.Mapper;
@@ -11,4 +12,7 @@ public interface AuditRecordMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "evaluatedAt", target = "timestamp")
     AuditRecordEntity fromDecisionMadeEvent(DecisionMadeEvent event);
+
+    @Mapping(source = "timestamp", target = "evaluatedAt")
+    HistoricalTransactionAuditRecord toHistoricalTransactionAuditRecord(AuditRecordEntity entity);
 }
