@@ -1,0 +1,136 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-rule-set-entity
+      author: mpoborowski
+      changes:
+        - createTable:
+            tableName: rule_set_entity
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: effective_from
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: effective_to
+                  type: timestamp with time zone
+
+        - addCheckConstraint:
+            tableName: rule_set_entity
+            constraintName: chk_rule_set_validity_window
+            constraintBody: effective_to IS NULL OR effective_to > effective_from
+
+        - createIndex:
+            tableName: rule_set_entity
+            indexName: idx_rule_set_entity_validity
+            columns:
+              - column:
+                  name: effective_from
+              - column:
+                  name: effective_to
+
+  - changeSet:
+      id: 002-create-rule-definition-entity
+      author: aquacode
+      changes:
+        - createTable:
+            tableName: rule_definition_entity
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rule_set_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: version
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: priority
+                  type: integer
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: enabled
+                  type: boolean
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: configuration
+                  type: jsonb
+                  defaultValueComputed: "'{}'::jsonb"
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            constraintName: fk_rule_definition_entity_rule_set
+            baseTableName: rule_definition_entity
+            baseColumnNames: rule_set_id
+            referencedTableName: rule_set_entity
+            referencedColumnNames: id
+            onDelete: CASCADE
+
+        - addUniqueConstraint:
+            tableName: rule_definition_entity
+            columnNames: rule_set_id, code, version
+            constraintName: uq_rule_definition_entity_code_version_per_set
+
+        - createIndex:
+            tableName: rule_definition_entity
+            indexName: idx_rule_definition_entity_rule_set_id
+            columns:
+              - column:
+                  name: rule_set_id
+
+        - createIndex:
+            tableName: rule_definition_entity
+            indexName: idx_rule_definition_entity_enabled_priority
+            columns:
+              - column:
+                  name: enabled
+              - column:
+                  name: priority
+
+        - createIndex:
+            tableName: rule_definition_entity
+            indexName: idx_rule_definition_entity_configuration_gin
+            using: gin
+            columns:
+              - column:
+                  name: configuration
