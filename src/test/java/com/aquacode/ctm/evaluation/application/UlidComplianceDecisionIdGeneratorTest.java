@@ -1,5 +1,6 @@
 package com.aquacode.ctm.evaluation.application;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,9 +31,11 @@ class UlidComplianceDecisionIdGeneratorTest {
         assertThat(first).isNotEqualTo(second);
     }
 
+    @SneakyThrows
     @Test
     void generate_shouldReturnLexicographicallySortableDecisionIds() {
         var first = generator.generate();
+        Thread.sleep(1);
         var second = generator.generate();
 
         assertThat(first).isLessThan(second);

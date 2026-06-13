@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-audit-record-entity
+      author: mpoborowski
+      changes:
+        - createTable:
+            tableName: audit_record_entity
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: transaction_id
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: decision_id
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: rule_set_version
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: decision
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: timestamp
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+
+        - createIndex:
+            tableName: audit_record_entity
+            indexName: idx_audit_record_entity_transaction_id
+            columns:
+              - column:
+                  name: transaction_id
+
+        - createIndex:
+            tableName: audit_record_entity
+            indexName: idx_audit_record_entity_timestamp
+            columns:
+              - column:
+                  name: timestamp

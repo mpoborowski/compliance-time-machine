@@ -1,6 +1,12 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/db.changelog-master.yaml
+      file: db/changelog/changes/001-create-rule-set-model.yaml
+
+  - include:
+      file: db/changelog/changes/002-create-audit-record-entity.yaml
+
+  - include:
+      file: db/changelog/changes/003-create-event-publication.yaml
 
   - include:
       file: db/changelog/changes/999-test-rule-set-data.yaml

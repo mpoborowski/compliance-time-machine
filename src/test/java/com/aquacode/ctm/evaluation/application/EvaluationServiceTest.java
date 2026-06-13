@@ -9,11 +9,14 @@ import com.aquacode.ctm.rules.RuleOutcome;
 import com.aquacode.ctm.rules.RuleResult;
 import com.aquacode.ctm.rules.RuleSet;
 import com.aquacode.ctm.rules.RuleSetResolver;
+import com.aquacode.ctm.shared.DecisionMadeEvent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -37,6 +40,9 @@ class EvaluationServiceTest {
     @Mock
     private ComplianceDecisionFactory decisionFactory;
 
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     private EvaluationService evaluationService;
 
@@ -45,13 +51,14 @@ class EvaluationServiceTest {
         var transaction = givenTransaction();
         var ruleSet = givenRuleSet("v1");
         var context = transaction.toEvaluationContext();
+        var expectedDecision = givenApprovedDecision();
 
         when(ruleSetResolver.resolve(transaction.transactionTimestamp()))
             .thenReturn(ruleSet);
         when(ruleEngine.evaluate(ruleSet, context))
             .thenReturn(List.of(passedResult()));
         when(decisionFactory.create(List.of(passedResult()), "v1"))
-            .thenReturn(givenApprovedDecision());
+            .thenReturn(expectedDecision);
 
         var decision = evaluationService.evaluate(transaction);
 
@@ -59,7 +66,7 @@ class EvaluationServiceTest {
         assertThat(decision.ruleSetVersion()).isEqualTo("v1");
         assertThat(decision.results()).containsExactly(passedResult());
 
-        verifyInteractions(transaction, ruleSet, context);
+        verifyInteractions(transaction, ruleSet, context, expectedDecision);
     }
 
     @Test
@@ -67,13 +74,14 @@ class EvaluationServiceTest {
         var transaction = givenTransaction();
         var ruleSet = givenRuleSet("v1");
         var context = transaction.toEvaluationContext();
+        var expectedDecision = givenFailedDecision();
 
         when(ruleSetResolver.resolve(transaction.transactionTimestamp()))
             .thenReturn(ruleSet);
         when(ruleEngine.evaluate(ruleSet, context))
             .thenReturn(List.of(failedResult()));
         when(decisionFactory.create(List.of(failedResult()), "v1"))
-            .thenReturn(givenFailedDecision());
+            .thenReturn(expectedDecision);
 
         var decision = evaluationService.evaluate(transaction);
 
@@ -81,7 +89,7 @@ class EvaluationServiceTest {
         assertThat(decision.ruleSetVersion()).isEqualTo("v1");
         assertThat(decision.results()).containsExactly(failedResult());
 
-        verifyInteractions(transaction, ruleSet, context);
+        verifyInteractions(transaction, ruleSet, context, expectedDecision);
     }
 
     private static Transaction givenTransaction() {
@@ -123,8 +131,21 @@ class EvaluationServiceTest {
         return new RuleResult(null, RuleOutcome.FAIL, "failure");
     }
 
-    private void verifyInteractions(Transaction transaction, RuleSet ruleSet, RuleEvaluationContext context) {
+    private void verifyInteractions(Transaction transaction, RuleSet ruleSet, RuleEvaluationContext context, ComplianceDecision decision) {
         verify(ruleSetResolver).resolve(transaction.transactionTimestamp());
         verify(ruleEngine).evaluate(ruleSet, context);
+        verify(decisionFactory).create(decision.results(), ruleSet.version());
+
+        var eventCaptor = ArgumentCaptor.forClass(Object.class);
+        verify(eventPublisher).publishEvent(eventCaptor.capture());
+
+        assertThat(eventCaptor.getValue())
+            .isInstanceOfSatisfying(DecisionMadeEvent.class, event -> {
+                assertThat(event.transactionId()).isEqualTo(transaction.transactionId());
+                assertThat(event.decisionId()).isEqualTo(decision.decisionId());
+                assertThat(event.decision()).isEqualTo(decision.decision().name());
+                assertThat(event.ruleSetVersion()).isEqualTo(decision.ruleSetVersion());
+                assertThat(event.evaluatedAt()).isEqualTo(decision.evaluatedAt());
+            });
     }
 }

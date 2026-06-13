@@ -27,10 +27,11 @@ databaseChangeLog:
                   name: effective_to
                   type: timestamp with time zone
 
-        - addCheckConstraint:
-            tableName: rule_set_entity
-            constraintName: chk_rule_set_validity_window
-            constraintBody: effective_to IS NULL OR effective_to > effective_from
+        - sql:
+            sql: >
+              ALTER TABLE rule_set_entity
+              ADD CONSTRAINT chk_rule_set_validity_window
+              CHECK (effective_to IS NULL OR effective_to > effective_from)
 
         - createIndex:
             tableName: rule_set_entity
