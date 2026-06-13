@@ -1,5 +1,6 @@
 package com.aquacode.ctm.evaluation.application;
 
+import com.aquacode.ctm.evaluation.ComplianceDecision;
 import com.aquacode.ctm.evaluation.Decision;
 import com.aquacode.ctm.evaluation.Transaction;
 import com.aquacode.ctm.rules.RuleEngine;
@@ -15,7 +16,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +34,9 @@ class EvaluationServiceTest {
     @Mock
     private RuleEngine ruleEngine;
 
+    @Mock
+    private ComplianceDecisionFactory decisionFactory;
+
     @InjectMocks
     private EvaluationService evaluationService;
 
@@ -42,9 +48,10 @@ class EvaluationServiceTest {
 
         when(ruleSetResolver.resolve(transaction.transactionTimestamp()))
             .thenReturn(ruleSet);
-
         when(ruleEngine.evaluate(ruleSet, context))
             .thenReturn(List.of(passedResult()));
+        when(decisionFactory.create(List.of(passedResult()), "v1"))
+            .thenReturn(givenApprovedDecision());
 
         var decision = evaluationService.evaluate(transaction);
 
@@ -63,9 +70,10 @@ class EvaluationServiceTest {
 
         when(ruleSetResolver.resolve(transaction.transactionTimestamp()))
             .thenReturn(ruleSet);
-
         when(ruleEngine.evaluate(ruleSet, context))
             .thenReturn(List.of(failedResult()));
+        when(decisionFactory.create(List.of(failedResult()), "v1"))
+            .thenReturn(givenFailedDecision());
 
         var decision = evaluationService.evaluate(transaction);
 
@@ -93,6 +101,18 @@ class EvaluationServiceTest {
             Instant.parse("2025-01-01T00:00:00Z"),
             List.of()
         );
+    }
+
+    private static ComplianceDecision givenApprovedDecision() {
+        return new ComplianceDecision("dec_1", Decision.APPROVED, "v1",
+            Clock.fixed(Instant.parse("2025-01-01T12:00:00Z"), ZoneOffset.UTC).instant(),
+            List.of(passedResult()));
+    }
+
+    private static ComplianceDecision givenFailedDecision() {
+        return new ComplianceDecision("dec_1", Decision.REJECTED, "v1",
+            Clock.fixed(Instant.parse("2025-01-01T12:00:00Z"), ZoneOffset.UTC).instant(),
+            List.of(failedResult()));
     }
 
     private static RuleResult passedResult() {

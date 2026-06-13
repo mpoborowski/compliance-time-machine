@@ -3,22 +3,29 @@ package com.aquacode.ctm.evaluation.application;
 import com.aquacode.ctm.evaluation.ComplianceDecision;
 import com.aquacode.ctm.evaluation.Decision;
 import com.aquacode.ctm.rules.RuleResult;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 
+@Component
+@RequiredArgsConstructor
 final class ComplianceDecisionFactory {
 
-    static ComplianceDecision create(List<RuleResult> results, String ruleSetVersion) {
+    private final ComplianceDecisionIdGenerator decisionIdGenerator;
+    private final Clock clock;
+
+    ComplianceDecision create(List<RuleResult> results, String ruleSetVersion) {
         var rejected = results.stream().anyMatch(RuleResult::failed);
         var decision = rejected ? Decision.REJECTED : Decision.APPROVED;
 
         return new ComplianceDecision(
-            UUID.randomUUID().toString(),
+            decisionIdGenerator.generate(),
             decision,
             ruleSetVersion,
-            Instant.now(),
+            Instant.now(clock),
             results
         );
     }

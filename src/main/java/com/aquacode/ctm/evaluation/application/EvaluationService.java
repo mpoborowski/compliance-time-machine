@@ -13,11 +13,12 @@ public class EvaluationService {
 
     private final RuleSetResolver ruleSetResolver;
     private final RuleEngine ruleEngine;
+    private final ComplianceDecisionFactory decisionFactory;
 
     public ComplianceDecision evaluate(Transaction transaction) {
         var ruleSet = ruleSetResolver.resolve(transaction.transactionTimestamp());
         var results = ruleEngine.evaluate(ruleSet, transaction.toEvaluationContext());
 
-        return ComplianceDecisionFactory.create(results, ruleSet.version());
+        return decisionFactory.create(results, ruleSet.version());
     }
 }
