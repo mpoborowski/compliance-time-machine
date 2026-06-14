@@ -3,8 +3,6 @@ package com.aquacode.ctm.rules.application;
 import com.aquacode.ctm.rules.RuleEvaluationContext;
 import com.aquacode.ctm.rules.RuleOutcome;
 import com.aquacode.ctm.rules.RuleSetNotFoundException;
-import com.aquacode.ctm.rules.infrastructure.persistence.RuleDefinitionEntity;
-import com.aquacode.ctm.rules.infrastructure.persistence.RuleDefinitionType;
 import com.aquacode.ctm.rules.infrastructure.persistence.RuleSetEntity;
 import com.aquacode.ctm.rules.infrastructure.persistence.RuleSetEntityMapper;
 import com.aquacode.ctm.rules.infrastructure.persistence.RuleSetRepository;
@@ -18,6 +16,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.aquacode.ctm.rules.RuleEntityFixtures.amountThresholdDefinitionEntity;
+import static com.aquacode.ctm.rules.RuleEntityFixtures.highRiskCountryRuleDefinitionEntity;
+import static com.aquacode.ctm.rules.RuleEntityFixtures.pepRuleDefinitionEntity;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -46,11 +47,11 @@ class SQLRuleSetResolverTest {
             .effectiveFrom(effectiveFrom)
             .effectiveTo(null)
             .rules(Set.of(
-                pepRule(30, true),
-                highRiskCountryRule(20, true, """
+                pepRuleDefinitionEntity(30, true),
+                highRiskCountryRuleDefinitionEntity(20, true, """
                     {"countries": ["RU", "KP"]}
                     """),
-                amountThresholdRule(10, true, """
+                amountThresholdDefinitionEntity(10, true, """
                     {"threshold": 100.00}
                     """)
             ))
@@ -76,11 +77,11 @@ class SQLRuleSetResolverTest {
             .effectiveFrom(Instant.parse("2025-01-01T00:00:00Z"))
             .effectiveTo(null)
             .rules(Set.of(
-                pepRule(30, true),
-                highRiskCountryRule(20, true, """
+                pepRuleDefinitionEntity(30, true),
+                highRiskCountryRuleDefinitionEntity(20, true, """
                     {"countries": ["RU", "KP"]}
                     """),
-                amountThresholdRule(10, true, """
+                amountThresholdDefinitionEntity(10, true, """
                     {"threshold": 100.00}
                     """)
             ))
@@ -109,8 +110,8 @@ class SQLRuleSetResolverTest {
             .effectiveFrom(Instant.parse("2025-01-01T00:00:00Z"))
             .effectiveTo(null)
             .rules(Set.of(
-                pepRule(10, false),
-                amountThresholdRule(20, true, """
+                pepRuleDefinitionEntity(10, false),
+                amountThresholdDefinitionEntity(20, true, """
                     {"threshold": 100.00}
                     """)
             ))
@@ -135,7 +136,7 @@ class SQLRuleSetResolverTest {
             .effectiveFrom(Instant.parse("2025-01-01T00:00:00Z"))
             .effectiveTo(null)
             .rules(Set.of(
-                amountThresholdRule(10, true, """
+                amountThresholdDefinitionEntity(10, true, """
                     {"threshold": 100.00}
                     """)
             ))
@@ -163,7 +164,7 @@ class SQLRuleSetResolverTest {
             .effectiveFrom(Instant.parse("2025-01-01T00:00:00Z"))
             .effectiveTo(null)
             .rules(Set.of(
-                highRiskCountryRule(10, true, """
+                highRiskCountryRuleDefinitionEntity(10, true, """
                     {"countries": ["RU", "KP"]}
                     """)
             ))
@@ -190,7 +191,7 @@ class SQLRuleSetResolverTest {
             .version("v1.0.0")
             .effectiveFrom(Instant.parse("2025-01-01T00:00:00Z"))
             .effectiveTo(null)
-            .rules(Set.of(pepRule(10, true)))
+            .rules(Set.of(pepRuleDefinitionEntity(10, true)))
             .build();
 
         when(ruleSetRepository.findActiveAt(pointInTime)).thenReturn(Optional.of(entity));
@@ -245,7 +246,7 @@ class SQLRuleSetResolverTest {
             .effectiveFrom(Instant.parse("2025-01-01T00:00:00Z"))
             .effectiveTo(null)
             .rules(Set.of(
-                amountThresholdRule(10, true, "{}")
+                amountThresholdDefinitionEntity(10, true, "{}")
             ))
             .build();
 
@@ -266,7 +267,7 @@ class SQLRuleSetResolverTest {
             .effectiveFrom(Instant.parse("2025-01-01T00:00:00Z"))
             .effectiveTo(null)
             .rules(Set.of(
-                highRiskCountryRule(10, true, "{}")
+                highRiskCountryRuleDefinitionEntity(10, true, "{}")
             ))
             .build();
 
@@ -275,52 +276,5 @@ class SQLRuleSetResolverTest {
         assertThatThrownBy(() -> resolver.resolve(pointInTime))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessageContaining("requires array JSON configuration field 'countries'");
-    }
-
-    private static RuleDefinitionEntity amountThresholdRule(
-        Integer priority,
-        Boolean enabled,
-        String configuration
-    ) {
-        return RuleDefinitionEntity.builder()
-            .id(UUID.randomUUID())
-            .code("AMOUNT_THRESHOLD")
-            .version("v1")
-            .description("Amount threshold rule")
-            .type(RuleDefinitionType.AMOUNT_THRESHOLD)
-            .priority(priority)
-            .enabled(enabled)
-            .configuration(configuration)
-            .build();
-    }
-
-    private static RuleDefinitionEntity highRiskCountryRule(
-        Integer priority,
-        Boolean enabled,
-        String configuration
-    ) {
-        return RuleDefinitionEntity.builder()
-            .id(UUID.randomUUID())
-            .code("HIGH_RISK_COUNTRY")
-            .version("v1")
-            .description("High risk country rule")
-            .type(RuleDefinitionType.HIGH_RISK_COUNTRY)
-            .priority(priority)
-            .enabled(enabled)
-            .configuration(configuration)
-            .build();
-    }
-
-    private static RuleDefinitionEntity pepRule(Integer priority, Boolean enabled) {
-        return RuleDefinitionEntity.builder()
-            .id(UUID.randomUUID())
-            .code("PEP")
-            .version("v1")
-            .description("PEP rule")
-            .type(RuleDefinitionType.PEP)
-            .priority(priority)
-            .enabled(enabled)
-            .configuration("{}")
-            .build();
     }
 }

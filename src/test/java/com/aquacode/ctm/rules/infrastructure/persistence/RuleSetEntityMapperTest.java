@@ -9,9 +9,9 @@ import org.mapstruct.factory.Mappers;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
+import static com.aquacode.ctm.rules.RuleEntityFixtures.ruleSetEntity;
+import static com.aquacode.ctm.rules.RuleEntityFixtures.ruleSetWithoutRules;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RuleSetEntityMapperTest {
@@ -23,13 +23,7 @@ class RuleSetEntityMapperTest {
         var effectiveFrom = Instant.parse("2025-01-01T00:00:00Z");
         var effectiveTo = Instant.parse("2026-01-01T00:00:00Z");
 
-        var entity = RuleSetEntity.builder()
-            .id(UUID.randomUUID())
-            .version("v1.0.0")
-            .effectiveFrom(effectiveFrom)
-            .effectiveTo(effectiveTo)
-            .rules(Set.of())
-            .build();
+        var entity = ruleSetWithoutRules(effectiveFrom, effectiveTo);
 
         var rules = List.of(testRule("AML-001"), testRule("AML-002"));
 
@@ -43,24 +37,7 @@ class RuleSetEntityMapperTest {
 
     @Test
     void toDomain_shouldUseProvidedDomainRules() {
-        var entity = RuleSetEntity.builder()
-            .id(UUID.randomUUID())
-            .version("v2.0.0")
-            .effectiveFrom(Instant.parse("2025-06-01T00:00:00Z"))
-            .effectiveTo(null)
-            .rules(Set.of(
-                RuleDefinitionEntity.builder()
-                    .id(UUID.randomUUID())
-                    .code("PERSISTED-RULE")
-                    .version("v1")
-                    .description("Persisted rule")
-                    .type(RuleDefinitionType.PEP)
-                    .priority(10)
-                    .enabled(true)
-                    .configuration("{}")
-                    .build()
-            ))
-            .build();
+        var entity = ruleSetEntity();
 
         var domainRule = testRule("DOMAIN-RULE");
 

@@ -4,24 +4,24 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static com.aquacode.ctm.rules.RulesTestDataProvider.PEP_RULE;
-import static com.aquacode.ctm.rules.RulesTestDataProvider.context;
+import static com.aquacode.ctm.rules.RuleFixtures.evaluationContext;
+import static com.aquacode.ctm.rules.RuleFixtures.pepRule;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PepRuleTest {
 
     @Test
     void evaluate_shouldPassOnNonPepCustomer() {
-        var result = PEP_RULE.evaluate(context(BigDecimal.TEN, "PL", false));
+        var result = pepRule().evaluate(evaluationContext(BigDecimal.TEN, "PL", false));
 
-        assertThat(result).isEqualTo(PEP_RULE.passedResult());
+        assertThat(result).isEqualTo(pepRule().passedResult());
     }
 
     @Test
     void evaluate_shouldFailOnPepCustomer() {
-        var result = PEP_RULE.evaluate(context(BigDecimal.TEN, "PL", true));
+        var result = pepRule().evaluate(evaluationContext(BigDecimal.TEN, "PL", true));
 
-        assertThat(result).isEqualTo(PEP_RULE.failedResult(PepRule.FAILED_EXPLANATION));
+        assertThat(result).isEqualTo(pepRule().failedResult(PepRule.FAILED_EXPLANATION));
     }
 
 }

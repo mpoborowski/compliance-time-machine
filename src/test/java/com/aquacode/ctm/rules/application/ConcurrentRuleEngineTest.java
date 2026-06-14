@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.aquacode.ctm.rules.RulesTestDataProvider.context;
+import static com.aquacode.ctm.rules.RuleFixtures.evaluationContext;
 import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -67,7 +67,7 @@ class ConcurrentRuleEngineTest extends RuleEngineContractTest {
         var ruleSet = new RuleSet("v1", Instant.now(), List.of(slowRule, slowRule2));
         long start = System.currentTimeMillis();
 
-        List<RuleResult> results = engine.evaluate(ruleSet, context(BigDecimal.ONE, "PL", false));
+        List<RuleResult> results = engine.evaluate(ruleSet, evaluationContext(BigDecimal.ONE, "PL", false));
         long duration = System.currentTimeMillis() - start;
 
         assertThat(results).hasSize(2);
@@ -88,7 +88,7 @@ class ConcurrentRuleEngineTest extends RuleEngineContractTest {
 
         var ruleSet = new RuleSet("v1", Instant.now(), List.of(r1, r2, r3));
 
-        engine.evaluate(ruleSet, context(BigDecimal.ONE, "PL", false));
+        engine.evaluate(ruleSet, evaluationContext(BigDecimal.ONE, "PL", false));
 
         Awaitility.await()
             .atMost(Duration.ofSeconds(2))
@@ -111,7 +111,7 @@ class ConcurrentRuleEngineTest extends RuleEngineContractTest {
 
         var ruleSet = new RuleSet("v1", Instant.now(), List.of(badRule));
 
-        assertThatThrownBy(() -> engine.evaluate(ruleSet, context(BigDecimal.ONE, "PL", false)))
+        assertThatThrownBy(() -> engine.evaluate(ruleSet, evaluationContext(BigDecimal.ONE, "PL", false)))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("Failed to process rules");
     }
