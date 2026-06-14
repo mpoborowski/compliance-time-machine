@@ -11,18 +11,15 @@ import java.util.Set;
 
 public final class RuleFixtures {
 
-    private static final AmountThresholdRule AMOUNT_THRESHOLD_RULE =
-        new AmountThresholdRule(
+    private static final AmountThresholdRule AMOUNT_THRESHOLD_RULE = new AmountThresholdRule(
             BigDecimal.TEN,
             new RuleMetadata("AML-003", "v1", "Amount threshold check"));
 
-    private static final HighRiskCountryRule HIGH_RISK_COUNTRY_RULE =
-        new HighRiskCountryRule(
+    private static final HighRiskCountryRule HIGH_RISK_COUNTRY_RULE = new HighRiskCountryRule(
             Set.of("RU", "KP", "IR", "MM"),
             new RuleMetadata("AML-002", "v1", "High risk country check"));
 
-    private static final PepRule PEP_RULE =
-        new PepRule(
+    private static final PepRule PEP_RULE = new PepRule(
             new RuleMetadata("AML-001", "v1", "PEP check"));
 
     public static RuleSet ruleSet() {
@@ -43,6 +40,19 @@ public final class RuleFixtures {
 
     public static PepRule pepRule() {
         return PEP_RULE;
+    }
+
+    public static RuleResult passedResult() {
+        return RuleResult.builder()
+            .outcome(RuleOutcome.PASS)
+            .build();
+    }
+
+    public static RuleResult failedResult() {
+        return RuleResult.builder()
+            .outcome(RuleOutcome.FAIL)
+            .explanation("failure")
+            .build();
     }
 
     public static RuleEvaluationContext evaluationContext(BigDecimal amount, String country, boolean pep) {

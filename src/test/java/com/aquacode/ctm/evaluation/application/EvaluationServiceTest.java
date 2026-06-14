@@ -5,8 +5,7 @@ import com.aquacode.ctm.evaluation.Decision;
 import com.aquacode.ctm.evaluation.Transaction;
 import com.aquacode.ctm.rules.RuleEngine;
 import com.aquacode.ctm.rules.RuleEvaluationContext;
-import com.aquacode.ctm.rules.RuleOutcome;
-import com.aquacode.ctm.rules.RuleResult;
+import com.aquacode.ctm.rules.RuleFixtures;
 import com.aquacode.ctm.rules.RuleSet;
 import com.aquacode.ctm.rules.RuleSetResolver;
 import com.aquacode.ctm.shared.DecisionMadeEvent;
@@ -19,11 +18,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.math.BigDecimal;
-import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.List;
 
+import static com.aquacode.ctm.evaluation.EvaluationFixtures.approvedDecision;
+import static com.aquacode.ctm.evaluation.EvaluationFixtures.failedDecision;
+import static com.aquacode.ctm.rules.RuleFixtures.failedResult;
+import static com.aquacode.ctm.rules.RuleFixtures.passedResult;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,9 +50,9 @@ class EvaluationServiceTest {
     @Test
     void evaluate_shouldReturnApprovedDecisionWhenAllRulesPass() {
         var transaction = givenTransaction();
-        var ruleSet = givenRuleSet("v1");
+        var ruleSet = RuleFixtures.ruleSet();
         var context = transaction.toEvaluationContext();
-        var expectedDecision = givenApprovedDecision();
+        var expectedDecision = approvedDecision();
 
         when(ruleSetResolver.resolve(transaction.transactionTimestamp()))
             .thenReturn(ruleSet);
@@ -72,9 +73,9 @@ class EvaluationServiceTest {
     @Test
     void evaluate_shouldReturnRejectedDecisionWhenAnyRuleFails() {
         var transaction = givenTransaction();
-        var ruleSet = givenRuleSet("v1");
+        var ruleSet = RuleFixtures.ruleSet();
         var context = transaction.toEvaluationContext();
-        var expectedDecision = givenFailedDecision();
+        var expectedDecision = failedDecision();
 
         when(ruleSetResolver.resolve(transaction.transactionTimestamp()))
             .thenReturn(ruleSet);
@@ -101,34 +102,6 @@ class EvaluationServiceTest {
             false,
             Instant.parse("2025-01-01T00:00:00Z")
         );
-    }
-
-    private static RuleSet givenRuleSet(String version) {
-        return new RuleSet(
-            version,
-            Instant.parse("2025-01-01T00:00:00Z"),
-            List.of()
-        );
-    }
-
-    private static ComplianceDecision givenApprovedDecision() {
-        return new ComplianceDecision("dec_1", Decision.APPROVED, "v1",
-            Clock.fixed(Instant.parse("2025-01-01T12:00:00Z"), ZoneOffset.UTC).instant(),
-            List.of(passedResult()));
-    }
-
-    private static ComplianceDecision givenFailedDecision() {
-        return new ComplianceDecision("dec_1", Decision.REJECTED, "v1",
-            Clock.fixed(Instant.parse("2025-01-01T12:00:00Z"), ZoneOffset.UTC).instant(),
-            List.of(failedResult()));
-    }
-
-    private static RuleResult passedResult() {
-        return new RuleResult(null, RuleOutcome.PASS, null);
-    }
-
-    private static RuleResult failedResult() {
-        return new RuleResult(null, RuleOutcome.FAIL, "failure");
     }
 
     private void verifyInteractions(Transaction transaction, RuleSet ruleSet, RuleEvaluationContext context, ComplianceDecision decision) {

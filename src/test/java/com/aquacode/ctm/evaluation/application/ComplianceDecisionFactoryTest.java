@@ -1,8 +1,6 @@
 package com.aquacode.ctm.evaluation.application;
 
 import com.aquacode.ctm.evaluation.Decision;
-import com.aquacode.ctm.rules.RuleOutcome;
-import com.aquacode.ctm.rules.RuleResult;
 import org.junit.jupiter.api.Test;
 
 import java.time.Clock;
@@ -10,6 +8,8 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.List;
 
+import static com.aquacode.ctm.rules.RuleFixtures.failedResult;
+import static com.aquacode.ctm.rules.RuleFixtures.passedResult;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ComplianceDecisionFactoryTest {
@@ -23,10 +23,7 @@ class ComplianceDecisionFactoryTest {
 
     @Test
     void create_shouldReturnApprovedDecisionWhenAllRulesPassed() {
-        var results = List.of(
-            new RuleResult(null, RuleOutcome.PASS, null),
-            new RuleResult(null, RuleOutcome.PASS, null)
-        );
+        var results = List.of(passedResult(), passedResult());
 
         var decision = factory.create(results, "v1");
 
@@ -39,10 +36,7 @@ class ComplianceDecisionFactoryTest {
 
     @Test
     void create_shouldReturnRejectedDecisionWhenAnyRuleFailed() {
-        var results = List.of(
-            new RuleResult(null, RuleOutcome.PASS, null),
-            new RuleResult(null, RuleOutcome.FAIL, "failure")
-        );
+        var results = List.of(passedResult(), failedResult());
 
         var decision = factory.create(results, "v1");
 
