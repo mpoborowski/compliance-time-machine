@@ -1,22 +1,19 @@
 package com.aquacode.ctm.evaluation.application;
 
 import com.aquacode.ctm.evaluation.ComplianceDecision;
-import com.aquacode.ctm.evaluation.Decision;
 import com.aquacode.ctm.evaluation.Transaction;
 import com.aquacode.ctm.evaluation.infrastructure.dto.EvaluateTransactionRequest;
 import com.aquacode.ctm.evaluation.infrastructure.dto.EvaluateTransactionResponse;
 import com.aquacode.ctm.evaluation.infrastructure.dto.TriggeredRuleResponse;
-import com.aquacode.ctm.rules.RuleMetadata;
-import com.aquacode.ctm.rules.RuleOutcome;
-import com.aquacode.ctm.rules.RuleResult;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 
+import static com.aquacode.ctm.evaluation.EvaluationFixtures.evaluateTransactionRequest;
+import static com.aquacode.ctm.evaluation.EvaluationFixtures.failedDecision;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class EvaluationMapperTest {
 
@@ -24,56 +21,43 @@ class EvaluationMapperTest {
 
     @Test
     void fromEvaluationRequest_shouldMapEvaluateTransactionRequestToTransaction() {
-        Instant now = Instant.now();
-        EvaluateTransactionRequest request = new EvaluateTransactionRequest(
-            "tx-123",
-            "cust-999",
-            "PL",
-            new BigDecimal("1500.50"),
-            true,
-            now
-        );
+        EvaluateTransactionRequest request = evaluateTransactionRequest();
 
         Transaction result = mapper.fromEvaluationRequest(request);
 
-        assertThat(result).isNotNull();
-        assertThat(result.transactionId()).isEqualTo("tx-123");
-        assertThat(result.customerId()).isEqualTo("cust-999");
-        assertThat(result.country()).isEqualTo("PL");
-        assertThat(result.amount()).isEqualByComparingTo("1500.50");
-        assertThat(result.politicallyExposedPerson()).isTrue();
-        assertThat(result.transactionTimestamp()).isEqualTo(now);
+        assertAll(
+            () -> assertThat(result).isNotNull(),
+            () -> assertThat(result.transactionId()).isEqualTo("tx-1"),
+            () -> assertThat(result.customerId()).isEqualTo("customer-1"),
+            () -> assertThat(result.country()).isEqualTo("PL"),
+            () -> assertThat(result.amount()).isEqualByComparingTo("10"),
+            () -> assertThat(result.politicallyExposedPerson()).isFalse(),
+            () -> assertThat(result.transactionTimestamp()).isEqualTo(Instant.parse("2025-01-01T12:00:00Z"))
+        );
     }
 
     @Test
     void fromComplianceDecision_shouldMapComplianceDecisionToEvaluateTransactionResponse() {
-        Instant now = Instant.now();
-
-        RuleMetadata metadata = new RuleMetadata("RULE_01", "v2", "Limit check");
-        RuleResult ruleResult = new RuleResult(metadata, RuleOutcome.FAIL, "Amount exceeded");
-
-        ComplianceDecision decision = new ComplianceDecision(
-            "dec-456",
-            Decision.REJECTED,
-            "v1.0.4",
-            now,
-            List.of(ruleResult)
-        );
+        ComplianceDecision decision = failedDecision();
 
         EvaluateTransactionResponse response = mapper.fromComplianceDecision(decision);
 
-        assertThat(response).isNotNull();
-        assertThat(response.decisionId()).isEqualTo("dec-456");
-        assertThat(response.decision()).isEqualTo("REJECTED");
-        assertThat(response.appliedRuleSetVersion()).isEqualTo("v1.0.4");
-        assertThat(response.evaluatedAt()).isEqualTo(now);
+        assertAll(
+            () -> assertThat(response).isNotNull(),
+            () -> assertThat(response.decisionId()).isEqualTo("dec_1"),
+            () -> assertThat(response.decision()).isEqualTo("REJECTED"),
+            () -> assertThat(response.appliedRuleSetVersion()).isEqualTo("v1"),
+            () -> assertThat(response.evaluatedAt()).isEqualTo(Instant.parse("2025-01-01T12:00:00Z")),
+            () -> assertThat(response.triggeredRules()).hasSize(1)
+        );
 
-        assertThat(response.triggeredRules()).hasSize(1);
         TriggeredRuleResponse ruleResponse = response.triggeredRules().getFirst();
-        assertThat(ruleResponse.ruleCode()).isEqualTo("RULE_01");
-        assertThat(ruleResponse.ruleVersion()).isEqualTo("v2");
-        assertThat(ruleResponse.outcome()).isEqualTo("FAIL");
-        assertThat(ruleResponse.explanation()).isEqualTo("Amount exceeded");
+        assertAll(
+            () -> assertThat(ruleResponse.ruleCode()).isEqualTo("AML-001"),
+            () -> assertThat(ruleResponse.ruleVersion()).isEqualTo("v1"),
+            () -> assertThat(ruleResponse.outcome()).isEqualTo("FAIL"),
+            () -> assertThat(ruleResponse.explanation()).isEqualTo("failure")
+        );
     }
 
     @Test

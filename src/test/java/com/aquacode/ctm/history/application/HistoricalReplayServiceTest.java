@@ -24,6 +24,7 @@ import java.util.Optional;
 import static com.aquacode.ctm.audit.AuditFixtures.historicalTransactionAuditRecord;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -81,12 +82,15 @@ class HistoricalReplayServiceTest {
 
         var replay = historicalReplayService.replay(transactionId);
 
-        assertThat(replay.transactionId()).isEqualTo(transactionId);
-        assertThat(replay.historicalTimestamp()).isEqualTo(HISTORICAL_TIMESTAMP);
-        assertThat(replay.ruleSetVersion()).isEqualTo("2025-Q1");
-        assertThat(replay.decision()).isEqualTo(Decision.APPROVED);
-        assertThat(replay.rules()).isEqualTo(historicalRuleReplays);
-        assertThat(replay.replayedAt()).isEqualTo(REPLAYED_AT);
+        assertAll(
+            () -> assertThat(replay).isNotNull(),
+            () -> assertThat(replay.transactionId()).isEqualTo(transactionId),
+            () -> assertThat(replay.historicalTimestamp()).isEqualTo(HISTORICAL_TIMESTAMP),
+            () -> assertThat(replay.ruleSetVersion()).isEqualTo("2025-Q1"),
+            () -> assertThat(replay.decision()).isEqualTo(Decision.APPROVED),
+            () -> assertThat(replay.rules()).isEqualTo(historicalRuleReplays),
+            () -> assertThat(replay.replayedAt()).isEqualTo(REPLAYED_AT)
+        );
 
         verify(auditHistory).findTransaction(transactionId);
         verify(ruleSetResolver).resolve(HISTORICAL_TIMESTAMP);
@@ -125,9 +129,12 @@ class HistoricalReplayServiceTest {
 
         var replay = historicalReplayService.replay(transactionId);
 
-        assertThat(replay.decision()).isEqualTo(Decision.REJECTED);
-        assertThat(replay.rules()).isEqualTo(historicalRuleReplays);
-        assertThat(replay.replayedAt()).isEqualTo(REPLAYED_AT);
+        assertAll(
+            () -> assertThat(replay).isNotNull(),
+            () -> assertThat(replay.decision()).isEqualTo(Decision.REJECTED),
+            () -> assertThat(replay.rules()).isEqualTo(historicalRuleReplays),
+            () -> assertThat(replay.replayedAt()).isEqualTo(REPLAYED_AT)
+        );
 
         verify(clock).instant();
     }

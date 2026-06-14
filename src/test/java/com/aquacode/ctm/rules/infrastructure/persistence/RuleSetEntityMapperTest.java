@@ -13,6 +13,7 @@ import java.util.List;
 import static com.aquacode.ctm.rules.RuleEntityFixtures.ruleSetEntity;
 import static com.aquacode.ctm.rules.RuleEntityFixtures.ruleSetWithoutRules;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class RuleSetEntityMapperTest {
 
@@ -29,10 +30,12 @@ class RuleSetEntityMapperTest {
 
         var result = mapper.toDomain(entity, rules);
 
-        assertThat(result).isNotNull();
-        assertThat(result.version()).isEqualTo("v1.0.0");
-        assertThat(result.effectiveFrom()).isEqualTo(effectiveFrom);
-        assertThat(result.rules()).containsExactlyElementsOf(rules);
+        assertAll(
+            () -> assertThat(result).isNotNull(),
+            () -> assertThat(result.version()).isEqualTo("v1.0.0"),
+            () -> assertThat(result.effectiveFrom()).isEqualTo(effectiveFrom),
+            () -> assertThat(result.rules()).containsExactlyElementsOf(rules)
+        );
     }
 
     @Test

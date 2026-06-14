@@ -4,10 +4,12 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
+@Builder
 public record EvaluateTransactionRequest(
     @NotBlank
     String transactionId,

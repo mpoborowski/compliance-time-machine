@@ -11,6 +11,7 @@ import java.util.List;
 import static com.aquacode.ctm.rules.RuleFixtures.failedResult;
 import static com.aquacode.ctm.rules.RuleFixtures.passedResult;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ComplianceDecisionFactoryTest {
 
@@ -27,11 +28,13 @@ class ComplianceDecisionFactoryTest {
 
         var decision = factory.create(results, "v1");
 
-        assertThat(decision.decision()).isEqualTo(Decision.APPROVED);
-        assertThat(decision.ruleSetVersion()).isEqualTo("v1");
-        assertThat(decision.results()).isEqualTo(results);
-        assertThat(decision.decisionId()).isEqualTo("dec_test-id");
-        assertThat(decision.evaluatedAt()).isEqualTo(NOW);
+        assertAll(
+            () -> assertThat(decision.decision()).isEqualTo(Decision.APPROVED),
+            () -> assertThat(decision.ruleSetVersion()).isEqualTo("v1"),
+            () -> assertThat(decision.results()).isEqualTo(results),
+            () -> assertThat(decision.decisionId()).isEqualTo("dec_test-id"),
+            () -> assertThat(decision.evaluatedAt()).isEqualTo(NOW)
+        );
     }
 
     @Test
@@ -40,8 +43,10 @@ class ComplianceDecisionFactoryTest {
 
         var decision = factory.create(results, "v1");
 
-        assertThat(decision.decision()).isEqualTo(Decision.REJECTED);
-        assertThat(decision.decisionId()).isEqualTo("dec_test-id");
-        assertThat(decision.evaluatedAt()).isEqualTo(NOW);
+        assertAll(
+            () -> assertThat(decision.decision()).isEqualTo(Decision.REJECTED),
+            () -> assertThat(decision.decisionId()).isEqualTo("dec_test-id"),
+            () -> assertThat(decision.evaluatedAt()).isEqualTo(NOW)
+        );
     }
 }

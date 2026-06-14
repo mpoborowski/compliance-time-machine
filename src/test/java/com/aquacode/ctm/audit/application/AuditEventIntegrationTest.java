@@ -21,6 +21,7 @@ import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static com.aquacode.ctm.shared.DecisionMadeFixtures.decisionMadeEvent;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest(classes = ComplianceTimeMachineApplication.class)
 @Import(TestcontainersConfiguration.class)
@@ -50,17 +51,18 @@ class AuditEventIntegrationTest {
         var auditRecord = awaitAuditRecord("tx-1")
             .orElseThrow(() -> new AssertionError("Audit record was not persisted within timeout"));
 
-        assertThat(auditRecord.id()).isNotNull();
-        assertThat(auditRecord.transactionId()).isEqualTo("tx-1");
-        assertThat(auditRecord.customerId()).isEqualTo("customer-1");
-        assertThat(auditRecord.country()).isEqualTo("PL");
-        assertThat(auditRecord.politicallyExposedPerson()).isFalse();
-        assertThat(auditRecord.amount()).isEqualByComparingTo(BigDecimal.TEN);
-        assertThat(auditRecord.transactionId()).isEqualTo("tx-1");
-        assertThat(auditRecord.decisionId()).isEqualTo("dec_1");
-        assertThat(auditRecord.ruleSetVersion()).isEqualTo("v1");
-        assertThat(auditRecord.decision()).isEqualTo(Decision.APPROVED.name());
-        assertThat(auditRecord.timestamp()).isEqualTo(Instant.parse("2025-01-01T12:00:00Z"));
+        assertAll(
+            () -> assertThat(auditRecord.id()).isNotNull(),
+            () -> assertThat(auditRecord.transactionId()).isEqualTo("tx-1"),
+            () -> assertThat(auditRecord.customerId()).isEqualTo("customer-1"),
+            () -> assertThat(auditRecord.country()).isEqualTo("PL"),
+            () -> assertThat(auditRecord.politicallyExposedPerson()).isFalse(),
+            () -> assertThat(auditRecord.amount()).isEqualByComparingTo(BigDecimal.TEN),
+            () -> assertThat(auditRecord.decisionId()).isEqualTo("dec_1"),
+            () -> assertThat(auditRecord.ruleSetVersion()).isEqualTo("v1"),
+            () -> assertThat(auditRecord.decision()).isEqualTo(Decision.APPROVED.name()),
+            () -> assertThat(auditRecord.timestamp()).isEqualTo(Instant.parse("2025-01-01T12:00:00Z"))
+        );
     }
 
     private Optional<AuditRecordEntity> awaitAuditRecord(String transactionId) {
