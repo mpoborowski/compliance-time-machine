@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 public class PepRule implements Rule {
 
     static final String FAILED_EXPLANATION = "Customer identified as PEP";
+    static final String PASSED_EXPLANATION = "Customer not identified as PEP";
 
     private final RuleMetadata metadata;
 
@@ -18,7 +19,7 @@ public class PepRule implements Rule {
     public RuleResult evaluate(RuleEvaluationContext context) {
         return context.politicallyExposedPerson() ?
             failedResult(FAILED_EXPLANATION) :
-            passedResult();
+            passedResult(PASSED_EXPLANATION);
     }
 
     @Override

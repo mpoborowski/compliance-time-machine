@@ -49,6 +49,7 @@ public final class RuleFixtures {
                 .version("v1")
                 .build())
             .outcome(RuleOutcome.PASS)
+            .explanation("success")
             .build();
     }
 

@@ -14,7 +14,7 @@ class PepRuleTest {
     void evaluate_shouldPassOnNonPepCustomer() {
         var result = pepRule().evaluate(evaluationContext(BigDecimal.TEN, "PL", false));
 
-        assertThat(result).isEqualTo(pepRule().passedResult());
+        assertThat(result).isEqualTo(pepRule().passedResult(PepRule.PASSED_EXPLANATION));
     }
 
     @Test

@@ -47,7 +47,8 @@ class HistoricalReplayMapperTest {
             () -> assertThat(rule).isNotNull(),
             () -> assertThat(rule.ruleCode()).isEqualTo("AML-001"),
             () -> assertThat(rule.version()).isEqualTo("v1"),
-            () -> assertThat(rule.outcome()).isEqualTo(RuleOutcome.PASS)
+            () -> assertThat(rule.outcome()).isEqualTo(RuleOutcome.PASS),
+            () -> assertThat(rule.explanation()).isEqualTo("success")
         );
     }
 }

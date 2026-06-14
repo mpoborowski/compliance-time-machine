@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 public class AmountThresholdRule implements Rule {
 
     static final String FAILED_EXPLANATION = "Transaction amount %s exceeds threshold %s";
+    static final String PASSED_EXPLANATION = "Transaction amount %s is within threshold %s";
 
     private final BigDecimal threshold;
     private final RuleMetadata metadata;
@@ -20,7 +21,7 @@ public class AmountThresholdRule implements Rule {
     public RuleResult evaluate(RuleEvaluationContext context) {
         return context.amount().compareTo(threshold) > 0 ?
             failedResult(FAILED_EXPLANATION.formatted(context.amount(), threshold)) :
-            passedResult();
+            passedResult(PASSED_EXPLANATION.formatted(context.amount(), threshold));
     }
 
     @Override

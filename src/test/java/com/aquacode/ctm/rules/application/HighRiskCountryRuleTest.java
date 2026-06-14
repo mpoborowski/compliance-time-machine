@@ -14,7 +14,8 @@ class HighRiskCountryRuleTest {
     void evaluate_shouldPassOnNonSanctionCountry() {
         var result = highRiskCountryRule().evaluate(evaluationContext(BigDecimal.TEN, "PL", false));
 
-        assertThat(result).isEqualTo(highRiskCountryRule().passedResult());
+        assertThat(result).isEqualTo(highRiskCountryRule()
+            .passedResult(HighRiskCountryRule.PASSED_EXPLANATION.formatted("PL")));
     }
 
     @Test

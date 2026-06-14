@@ -55,7 +55,7 @@ class HistoryControllerTest {
                         "PEP-001",
                         "v1",
                         RuleOutcome.PASS,
-                        "Customer is not PEP"
+                        "Customer not identified as PEP"
                     )
                 ),
                 Instant.parse("2026-06-13T15:40:00Z")
@@ -74,7 +74,7 @@ class HistoryControllerTest {
             .andExpect(jsonPath("$.rules[1].ruleCode").value("PEP-001"))
             .andExpect(jsonPath("$.rules[1].version").value("v1"))
             .andExpect(jsonPath("$.rules[1].outcome").value("PASS"))
-            .andExpect(jsonPath("$.rules[1].explanation").value("Customer is not PEP"))
+            .andExpect(jsonPath("$.rules[1].explanation").value("Customer not identified as PEP"))
             .andExpect(jsonPath("$.replayedAt").value("2026-06-13T15:40:00Z"));
     }
 

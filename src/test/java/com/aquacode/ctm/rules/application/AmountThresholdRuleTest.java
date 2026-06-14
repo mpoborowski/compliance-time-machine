@@ -14,14 +14,16 @@ class AmountThresholdRuleTest {
     void evaluate_shouldPassOnAmountLowerThanThreshold() {
         var result = amountThresholdRule().evaluate(evaluationContext(BigDecimal.valueOf(9), "PL", false));
 
-        assertThat(result).isEqualTo(amountThresholdRule().passedResult());
+        assertThat(result).isEqualTo(amountThresholdRule()
+            .passedResult(AmountThresholdRule.PASSED_EXPLANATION.formatted(BigDecimal.valueOf(9), BigDecimal.TEN)));
     }
 
     @Test
     void evaluate_shouldPassOnExactAmountAsThreshold() {
         var result = amountThresholdRule().evaluate(evaluationContext(BigDecimal.TEN, "PL", false));
 
-        assertThat(result).isEqualTo(amountThresholdRule().passedResult());
+        assertThat(result).isEqualTo(amountThresholdRule()
+            .passedResult(AmountThresholdRule.PASSED_EXPLANATION.formatted(BigDecimal.TEN, BigDecimal.TEN)));
     }
 
     @Test
@@ -29,6 +31,7 @@ class AmountThresholdRuleTest {
         var exceededAmount = BigDecimal.valueOf(11);
         var result = amountThresholdRule().evaluate(evaluationContext(exceededAmount, "PL", false));
 
-        assertThat(result).isEqualTo(amountThresholdRule().failedResult(AmountThresholdRule.FAILED_EXPLANATION.formatted(exceededAmount, BigDecimal.TEN)));
+        assertThat(result).isEqualTo(amountThresholdRule()
+            .failedResult(AmountThresholdRule.FAILED_EXPLANATION.formatted(exceededAmount, BigDecimal.TEN)));
     }
 }

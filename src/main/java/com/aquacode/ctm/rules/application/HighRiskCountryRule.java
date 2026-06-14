@@ -12,6 +12,7 @@ import java.util.Set;
 public class HighRiskCountryRule implements Rule {
 
     static final String FAILED_EXPLANATION = "Country %s classified as high risk";
+    static final String PASSED_EXPLANATION = "Country %s classified as non-high risk";
 
     private final Set<String> highRiskCountries;
     private final RuleMetadata metadata;
@@ -20,7 +21,7 @@ public class HighRiskCountryRule implements Rule {
     public RuleResult evaluate(RuleEvaluationContext context) {
         return highRiskCountries.contains(context.country()) ?
             failedResult(FAILED_EXPLANATION.formatted(context.country())) :
-            passedResult();
+            passedResult(PASSED_EXPLANATION.formatted(context.country()));
     }
 
     @Override

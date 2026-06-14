@@ -40,7 +40,7 @@ class ConcurrentRuleEngineTest extends RuleEngineContractTest {
             public RuleResult evaluate(RuleEvaluationContext context) {
                 sleep(500);
                 counter.incrementAndGet();
-                return passedResult();
+                return passedResult("success");
             }
 
             @Override
@@ -55,7 +55,7 @@ class ConcurrentRuleEngineTest extends RuleEngineContractTest {
             public RuleResult evaluate(RuleEvaluationContext context) {
                 sleep(500);
                 counter.incrementAndGet();
-                return passedResult();
+                return passedResult("success");
             }
 
             @Override
@@ -123,7 +123,7 @@ class ConcurrentRuleEngineTest extends RuleEngineContractTest {
             public RuleResult evaluate(RuleEvaluationContext context) {
                 sleep(ms);
                 executed.add(id);
-                return passedResult();
+                return passedResult("success");
             }
 
             @Override

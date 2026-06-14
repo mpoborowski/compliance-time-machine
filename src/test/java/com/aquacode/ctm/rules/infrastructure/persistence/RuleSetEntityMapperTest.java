@@ -60,7 +60,7 @@ class RuleSetEntityMapperTest {
         return new Rule() {
             @Override
             public RuleResult evaluate(RuleEvaluationContext context) {
-                return passedResult();
+                return passedResult("success");
             }
 
             @Override

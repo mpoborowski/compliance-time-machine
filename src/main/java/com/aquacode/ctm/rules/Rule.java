@@ -14,10 +14,11 @@ public interface Rule {
             .build();
     }
 
-    default RuleResult passedResult() {
+    default RuleResult passedResult(String explanation) {
         return RuleResult.builder()
             .outcome(RuleOutcome.PASS)
             .metadata(metadata())
+            .explanation(explanation)
             .build();
     }
 }
