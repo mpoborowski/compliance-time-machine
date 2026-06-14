@@ -1,7 +1,6 @@
-package shared;
+package com.aquacode.ctm.shared;
 
 import com.aquacode.ctm.evaluation.Decision;
-import com.aquacode.ctm.shared.DecisionMadeEvent;
 
 import java.math.BigDecimal;
 import java.time.Instant;

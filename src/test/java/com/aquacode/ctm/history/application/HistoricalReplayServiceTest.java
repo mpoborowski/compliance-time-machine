@@ -1,9 +1,8 @@
 package com.aquacode.ctm.history.application;
 
 import com.aquacode.ctm.audit.AuditHistory;
-import com.aquacode.ctm.audit.HistoricalTransactionAuditRecord;
 import com.aquacode.ctm.evaluation.Decision;
-import com.aquacode.ctm.evaluation.Transaction;
+import com.aquacode.ctm.evaluation.EvaluationFixtures;
 import com.aquacode.ctm.rules.RuleEngine;
 import com.aquacode.ctm.rules.RuleMetadata;
 import com.aquacode.ctm.rules.RuleOutcome;
@@ -17,12 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import static com.aquacode.ctm.audit.AuditFixtures.historicalTransactionAuditRecord;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
@@ -33,7 +32,6 @@ import static org.mockito.Mockito.when;
 class HistoricalReplayServiceTest {
 
     private static final Instant HISTORICAL_TIMESTAMP = Instant.parse("2025-01-01T12:00:00Z");
-    private static final Instant TRANSACTION_TIMESTAMP = Instant.parse("2025-01-01T00:00:00Z");
     private static final Instant REPLAYED_AT = Instant.parse("2026-06-13T15:40:00Z");
 
     @Mock
@@ -57,8 +55,8 @@ class HistoricalReplayServiceTest {
     @Test
     void replay_shouldReconstructApprovedHistoricalDecision() {
         var transactionId = "tx-1";
-        var auditRecord = givenHistoricalTransactionAuditRecord();
-        var transaction = givenTransaction();
+        var auditRecord = historicalTransactionAuditRecord();
+        var transaction = EvaluationFixtures.transaction();
         var ruleSet = givenRuleSet();
         var ruleResults = List.of(
             givenRuleResult("AML-001", "v1", RuleOutcome.PASS, "Transaction amount below threshold"),
@@ -101,8 +99,8 @@ class HistoricalReplayServiceTest {
     @Test
     void replay_shouldReconstructRejectedHistoricalDecisionWhenAnyRuleFailed() {
         var transactionId = "tx-1";
-        var auditRecord = givenHistoricalTransactionAuditRecord();
-        var transaction = givenTransaction();
+        var auditRecord = historicalTransactionAuditRecord();
+        var transaction = EvaluationFixtures.transaction();
         var ruleSet = givenRuleSet();
         var ruleResults = List.of(
             givenRuleResult("AML-001", "v1", RuleOutcome.PASS, "Transaction amount below threshold"),
@@ -152,7 +150,7 @@ class HistoricalReplayServiceTest {
     @Test
     void replay_shouldThrowUnreplayableWhenHistoricalRuleSetCannotBeResolved() {
         var transactionId = "tx-1";
-        var auditRecord = givenHistoricalTransactionAuditRecord();
+        var auditRecord = historicalTransactionAuditRecord();
         var cause = new RuleSetNotFoundException(HISTORICAL_TIMESTAMP);
 
         when(auditHistory.findTransaction(transactionId))
@@ -172,32 +170,6 @@ class HistoricalReplayServiceTest {
         verifyNoInteractions(ruleEngine, mapper, clock);
     }
 
-    private static HistoricalTransactionAuditRecord givenHistoricalTransactionAuditRecord() {
-        return new HistoricalTransactionAuditRecord(
-            "tx-1",
-            "customer-1",
-            "PL",
-            BigDecimal.TEN,
-            false,
-            TRANSACTION_TIMESTAMP,
-            "dec-1",
-            "2025-Q1",
-            Decision.APPROVED,
-            HISTORICAL_TIMESTAMP
-        );
-    }
-
-    private static Transaction givenTransaction() {
-        return new Transaction(
-            "tx-1",
-            "customer-1",
-            "PL",
-            BigDecimal.TEN,
-            false,
-            TRANSACTION_TIMESTAMP
-        );
-    }
-
     private static RuleSet givenRuleSet() {
         return new RuleSet(
             "2025-Q1",
@@ -206,12 +178,7 @@ class HistoricalReplayServiceTest {
         );
     }
 
-    private static RuleResult givenRuleResult(
-        String ruleCode,
-        String ruleVersion,
-        RuleOutcome outcome,
-        String explanation
-    ) {
+    private static RuleResult givenRuleResult(String ruleCode, String ruleVersion, RuleOutcome outcome, String explanation) {
         return RuleResult.builder()
             .metadata(new RuleMetadata(ruleCode, ruleVersion, "Test rule"))
             .outcome(outcome)

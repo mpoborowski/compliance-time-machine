@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static com.aquacode.ctm.audit.AuditFixtures.auditRecordEntity;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static shared.DecisionMadeFixtures.decisionMadeEvent;
+import static com.aquacode.ctm.shared.DecisionMadeFixtures.decisionMadeEvent;
 
 @ExtendWith(MockitoExtension.class)
 class AuditEventListenerTest {

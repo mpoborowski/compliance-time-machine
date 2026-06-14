@@ -1,5 +1,6 @@
 package com.aquacode.ctm.evaluation;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -27,6 +28,17 @@ public final class EvaluationFixtures {
             .ruleSetVersion("v1")
             .evaluatedAt(Clock.fixed(Instant.parse("2025-01-01T12:00:00Z"), ZoneOffset.UTC).instant())
             .results(List.of(failedResult()))
+            .build();
+    }
+
+    public static Transaction transaction() {
+        return Transaction.builder()
+            .transactionId("tx-1")
+            .customerId("customer-1")
+            .country("PL")
+            .amount(BigDecimal.TEN)
+            .politicallyExposedPerson(false)
+            .transactionTimestamp(Instant.parse("2025-01-01T00:00:00Z"))
             .build();
     }
 }

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static shared.DecisionMadeFixtures.decisionMadeEvent;
+import static com.aquacode.ctm.shared.DecisionMadeFixtures.decisionMadeEvent;
 
 class AuditRecordMapperTest {
 

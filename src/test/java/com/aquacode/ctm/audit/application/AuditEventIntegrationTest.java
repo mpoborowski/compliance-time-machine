@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static shared.DecisionMadeFixtures.decisionMadeEvent;
+import static com.aquacode.ctm.shared.DecisionMadeFixtures.decisionMadeEvent;
 
 @SpringBootTest(classes = ComplianceTimeMachineApplication.class)
 @Import(TestcontainersConfiguration.class)

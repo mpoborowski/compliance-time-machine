@@ -44,12 +44,20 @@ public final class RuleFixtures {
 
     public static RuleResult passedResult() {
         return RuleResult.builder()
+            .metadata(RuleMetadata.builder()
+                .code("AML-001")
+                .version("v1")
+                .build())
             .outcome(RuleOutcome.PASS)
             .build();
     }
 
     public static RuleResult failedResult() {
         return RuleResult.builder()
+            .metadata(RuleMetadata.builder()
+                .code("AML-001")
+                .version("v1")
+                .build())
             .outcome(RuleOutcome.FAIL)
             .explanation("failure")
             .build();
