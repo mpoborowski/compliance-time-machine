@@ -5,7 +5,6 @@ import com.aquacode.ctm.TestcontainersConfiguration;
 import com.aquacode.ctm.audit.infrastructure.persistence.AuditRecordEntity;
 import com.aquacode.ctm.audit.infrastructure.persistence.AuditRepository;
 import com.aquacode.ctm.evaluation.Decision;
-import com.aquacode.ctm.shared.DecisionMadeEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static shared.DecisionMadeFixtures.decisionMadeEvent;
 
 @SpringBootTest(classes = ComplianceTimeMachineApplication.class)
 @Import(TestcontainersConfiguration.class)
@@ -43,19 +43,7 @@ class AuditEventIntegrationTest {
 
     @Test
     void shouldPersistAuditRecordWhenDecisionMadeEventIsPublishedAfterTransactionCommit() {
-        var evaluatedAt = Instant.parse("2025-01-01T12:00:00Z");
-        var event = DecisionMadeEvent.builder()
-            .transactionId("tx-1")
-            .customerId("customer-1")
-            .politicallyExposedPerson(false)
-            .amount(BigDecimal.TEN)
-            .country("PL")
-            .ruleSetVersion("v1")
-            .decisionId("dec_1")
-            .decision(Decision.APPROVED.name())
-            .evaluatedAt(evaluatedAt)
-            .transactionTimestamp(evaluatedAt)
-            .build();
+        var event = decisionMadeEvent();
 
         transactionTemplate.executeWithoutResult(_ -> eventPublisher.publishEvent(event));
 
@@ -72,7 +60,7 @@ class AuditEventIntegrationTest {
         assertThat(auditRecord.decisionId()).isEqualTo("dec_1");
         assertThat(auditRecord.ruleSetVersion()).isEqualTo("v1");
         assertThat(auditRecord.decision()).isEqualTo(Decision.APPROVED.name());
-        assertThat(auditRecord.timestamp()).isEqualTo(evaluatedAt);
+        assertThat(auditRecord.timestamp()).isEqualTo(Instant.parse("2025-01-01T12:00:00Z"));
     }
 
     private Optional<AuditRecordEntity> awaitAuditRecord(String transactionId) {
@@ -80,11 +68,9 @@ class AuditEventIntegrationTest {
 
         while (Instant.now().isBefore(deadline)) {
             var auditRecord = findAuditRecord(transactionId);
-
             if (auditRecord.isPresent()) {
                 return auditRecord;
             }
-
             sleep();
         }
 
